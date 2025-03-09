@@ -39,6 +39,7 @@ function updateapt (){
 	sleep 30
 	apt install rinetd
 	systemctl enable --now rinetd.service
+	cat "">/etc/rinetd.conf
 }
 
 function Addnewbind () {
@@ -91,10 +92,10 @@ function edit_bind(){
 	while true ;do
 		read answofcase
 		case $answofcase in
-			1)echo 'sorry that app in beta';;
-			2)echo 'sorry that app in beta';;
-			3)echo 'sorry that app in beta';;
-			4)echo 'sorry that app in beta';;
+			1)echo 'sorry that app in beta' && break ;;
+			2)echo 'sorry that app in beta' && break ;;
+			3)echo 'sorry that app in beta' && break ;;
+			4)echo 'sorry that app in beta' && break ;;
 			5)while true;do
         			printf "I need now bind addres Example:68.129.200.1 \n{hint you can add address of interface or 0.0.0.0 for all ints}\n"
         			read addrs
@@ -121,12 +122,12 @@ function edit_bind(){
         		do
                 		read answ
                 		case $answ in
-                        		yes)cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"	"$3"	"$4"	"$5}' >/etc/rinetd.conf && echo "$addrs        $bindport       $connectaddr            $destport">> /etc/rinetd.conf ; sysrest ;  break ;;
+                        		yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"	"$3"	"$4"	"$5}'`; echo "$abb" >/etc/rinetd.conf && echo "$addrs        $bindport       $connectaddr            $destport">> /etc/rinetd.conf ; sysrest &&  break ;;
                         		no)printf "OK no updates" && break ;;
                         		*)printf 'Yes or no only';;
                 		esac
         		done
-;;
+break;;
 			6) echo 'sorry that app in beta';;
 			*)printf 'No options';;
 		esac
@@ -152,11 +153,11 @@ function sudouser () {
 
 function appcase () {
 clear
-printf "Wellcome to rinetd autoadd \n 1)Add new record (IPv4) \n 2)Edit records (IPv4) (this is beta option and it don't work pls edit it manualy\nPath /etc/rinetd.conf)\n 3)Update and install rinetd {Warning this may couse errors} \n 4)Exit app \n "
+printf "Wellcome to rinetd autoadd \n 1)Add new record (IPv4) \n 2)Edit records (IPv4) \n 3)Update and install rinetd {Warning this may couse errors} \n 4)Exit app \n "
 read operation
 case $operation in
 	1)Addnewbind;;
-	2)printf "This is beta" echo"#edit_bind";;
+	2)edit_bind;;
 	3)updateapt;;
 	4)printf "end";;
 	*)appcase;;
