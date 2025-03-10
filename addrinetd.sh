@@ -84,7 +84,6 @@ old_sour_ip=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{p
 old_sour_port=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $3}'`
 old_dst_ip=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $4}'`
 old_dst_port=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $5}'`
-echo "$old_sour_ip $old_sour_port $old_dst_ip $old_dst_port"
 }
 
 
@@ -104,9 +103,52 @@ function edit_bind(){
 	while true ;do
 		read answofcase
 		case $answofcase in
-			1)echo 'sorry that app in beta' && break ;;
-			2)echo 'sorry that app in beta' && break ;;
-			3)echo 'sorry that app in beta' && break ;;
+			1)printf "All line : " ; cat -n /etc/rinetd.conf | grep -v '#' | grep -w $numofgrep  ;
+                          printf "\nNew Bind address ip?\nOld ip:$old_sour_ip\n"
+                                while true;do
+                                read newsourip
+                                validate_addrs "$newsourip" && break
+                                printf "Invalid ip addr"
+                                done
+                          while true ;do
+                                printf "\nContinue?\n[yes/no]"
+                                read ansofcase
+                                case $ansofcase in
+                			yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"    "$3"    "$4"    "$5}'`; echo "$abb" >/etc/rinetd.conf &&echo "$newsourip $old_sour_port	$old_dst_ip	$old_dst_port">>/etc/rinetd.conf && break;;
+                                        no) printf "okeay" && break;;
+                                        *)printf "Yes or no only";;
+                                esac
+done && break ;;
+
+			2)printf "All line : " ; cat -n /etc/rinetd.conf | grep -v '#' | grep -w $numofgrep  ;
+                          printf "\nNew Sourport?\nOld port:$old_sour_port\n"
+                                read newsourport
+                          while true ;do
+                                printf "\nContinue?\n[yes/no]"
+                                read ansofcase
+                                case $ansofcase in
+                                        yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"    "$3"    "$4"    "$5}'`; echo "$abb" >/etc/rinetd.conf &&echo "$old_sour_ip	$newsourport	$old_dst_ip	$old_dst_port">>/etc/rinetd.conf && break;;
+                                        no) printf "okeay" && break;;
+                                        *)printf "Yes or no only";;
+                                esac
+done && break ;;
+			3)printf "All line : " ; cat -n /etc/rinetd.conf | grep -v '#' | grep -w $numofgrep  ;
+                          printf "\nNew Connection ip?\nOld ip:$old_dst_ip\n"
+				while true;do
+                                read newdestip
+				validate_addrs "$newdestip" && break
+				printf "Invalid ip addr"
+				done
+                          while true ;do
+                                printf "\nContinue?\n[yes/no]"
+                                read ansofcase
+                                case $ansofcase in
+                                        yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"    "$3"    "$4"    "$5}'`; echo "$abb" >/etc/rinetd.conf &&echo "$old_sour_ip $old_sour_port $newdestip $old_dst_port">>/etc/rinetd.conf && break;;
+                                        no) printf "okeay" && break;;
+                                        *)printf "Yes or no only";;
+                                esac
+done && break ;;
+
 			4)printf "All line : " ; cat -n /etc/rinetd.conf | grep -v '#' | grep -w $numofgrep  ;
 			  printf "\nNew destport?\nOld port:$old_dst_port\n"
 				read newdestport 
