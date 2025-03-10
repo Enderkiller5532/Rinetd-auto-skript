@@ -78,6 +78,17 @@ function Addnewbind () {
 	done
 }
 
+function newports(){
+
+old_sour_ip=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $2}'`
+old_sour_port=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $3}'`
+old_dst_ip=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $4}'`
+old_dst_port=`cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep | awk '{print $5}'`
+echo "$old_sour_ip $old_sour_port $old_dst_ip $old_dst_port"
+}
+
+
+
 function edit_bind(){
 	clear
 	printf "Creating backup...\n"	;cp /etc/rinetd.conf /var/backups/rinetd.conf
@@ -87,15 +98,27 @@ function edit_bind(){
 	printf "\nNow we need line that we edit. [Example:33]"
 	read  numofgrep
 	file_edit=`cat -n /etc/rinetd.conf | grep -v '#' | grep -vw $numofgrep`
-	cat -n /etc/rinetd.conf | grep -v '#'| grep numofgrep 
+	cat -n /etc/rinetd.conf | grep -v '#'| grep -w $numofgrep 
 	printf "What edit\n1)Bind addres[1]\n2)Bind port[2]\n3)Connection address[3]\n4)Destport[4]\n5)All[5]\n6)Delete Bind[6]"
+	newports
 	while true ;do
 		read answofcase
 		case $answofcase in
 			1)echo 'sorry that app in beta' && break ;;
 			2)echo 'sorry that app in beta' && break ;;
 			3)echo 'sorry that app in beta' && break ;;
-			4)echo 'sorry that app in beta' && break ;;
+			4)printf "All line : " ; cat -n /etc/rinetd.conf | grep -v '#' | grep -w $numofgrep  ;
+			  printf "\nNew destport?\nOld port:$old_dst_port\n"
+				read newdestport 
+			  while true ;do
+				printf "\nContinue?\n[yes/no]"
+				read ansofcase
+			        case $ansofcase in
+					yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  |awk '{print $2"    "$3"    "$4"    "$5}'`; echo "$abb" >/etc/rinetd.conf &&echo "$old_sour_ip  $old_sour_port  $old_dst_ip     $newdestport">>/etc/rinetd.conf && break;;
+					no) printf "okeay" && break;;
+					*)printf "Yes or no only";;
+				esac
+done && break ;;
 			5)while true;do
         			printf "I need now bind addres Example:68.129.200.1 \n{hint you can add address of interface or 0.0.0.0 for all ints}\n"
         			read addrs
@@ -128,7 +151,17 @@ function edit_bind(){
                 		esac
         		done
 break;;
-			6) echo 'sorry that app in beta';;
+			6) while true; do 
+				delete=`cat -n /etc/rinetd.conf | grep -v '#' | grep -vw $numofgrep`
+				printf "Okay i get it.\nDelete $delete?[yes/no]"
+				read deletedo
+					case $deletedo in
+						yes)abb=`cat -n /etc/rinetd.conf | grep -v '#'|grep -vw $numofgrep  | awk '{print $2"    "$3"    "$4"    "$5}'`;echo "$abb" >/etc/rinetd.conf ; printf "succses" && break;;
+						no)printf "No changes" && break;;
+						*)printf "yes/no only";;
+					esac
+			  done
+break;;
 			*)printf 'No options';;
 		esac
 	done
